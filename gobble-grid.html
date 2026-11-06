@@ -84,6 +84,17 @@ body{margin:0;
 .bossname{font-family:var(--display);font-size:clamp(18px,3.6vw,26px);color:var(--cream);text-shadow:0 2px 0 var(--ink);white-space:nowrap;letter-spacing:.02em}
 .hp{flex:1;min-width:80px;height:18px;border-radius:999px;background:var(--ink);overflow:hidden;border:2px solid var(--ink)}
 .hpfill{height:100%;width:100%;background:var(--sun);border-radius:999px;transition:width .35s ease-out}
+.coach{display:flex;align-items:center;gap:12px;background:var(--cream);color:var(--ink);border-radius:16px;padding:10px 16px;
+  box-shadow:0 4px 0 var(--sun-dark);position:relative}
+.coach::after{content:"";position:absolute;bottom:-10px;left:44px;border:10px solid transparent;border-bottom:0;border-top-color:var(--cream)}
+.coach-face{flex:none;width:46px;height:46px}
+.coach-face svg{width:100%;height:100%}
+.coach-body{min-width:0;display:flex;flex-direction:column;gap:2px}
+.coach-step{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--berry)}
+.coach-text{font-size:clamp(15px,2.4vw,19px);line-height:1.35;text-wrap:pretty}
+.coach.pop{animation:pop .3s ease-out}
+.cell.target .t{animation:targetGlow .55s ease-in-out infinite alternate}
+@keyframes targetGlow{from{box-shadow:inset 0 0 0 3px var(--gob),0 0 4px var(--gob)}to{box-shadow:inset 0 0 0 5px var(--gob),0 0 22px var(--gob)}}
 .boss-stage{display:flex;justify-content:center;height:100px;margin-bottom:-18px;position:relative;z-index:1;pointer-events:none}
 .boss-stage svg{height:100%;width:auto;overflow:visible}
 .cyclops .club{transform-box:view-box;transform-origin:150px 72px;transition:transform .25s ease-out}
@@ -98,6 +109,16 @@ body{margin:0;
   display:grid;place-items:center}
 @keyframes flash{from{opacity:.45}to{opacity:1}}
 .smash.hit{animation:none;background:rgba(255,107,91,.65)}
+.smash.col{right:auto;top:0;height:100%}
+.smash.col span{writing-mode:vertical-rl;text-orientation:upright;font-size:calc(5cqw * var(--k))}
+.cyclops.angry{--cyclops:#d9677e}
+.cyclops.angry .club{filter:drop-shadow(0 0 6px var(--grumble))}
+.rule.boss.enraged .hpfill{background:var(--berry)}
+.rule.boss.enraged .bossname::after{content:" (angry!)";color:var(--sun)}
+.boss-msg{position:absolute;left:0;right:0;top:38%;z-index:6;text-align:center;pointer-events:none;
+  font-family:var(--display);font-size:calc(8cqw * var(--k));color:var(--sun);text-shadow:0 4px 0 var(--berry),0 0 18px var(--ink);
+  animation:angry 1.8s ease-out forwards}
+@keyframes angry{0%{transform:scale(.4);opacity:0}15%{transform:scale(1.15);opacity:1}25%{transform:scale(1)}80%{opacity:1}100%{opacity:0}}
 .smash span{font-family:var(--display);font-size:calc(9cqw * var(--k));color:var(--cream);text-shadow:0 3px 0 var(--ink)}
 .board.shake{animation:shake .4s}
 .card-sprite.wide{width:200px;height:110px}
@@ -283,6 +304,10 @@ button:focus-visible,summary:focus-visible{outline:3px solid var(--sun);outline-
   </div>
 
   <div class="boss-stage" id="bossStage" hidden></div>
+  <div class="coach" id="coach" hidden>
+    <div class="coach-face" id="coachFace"></div>
+    <div class="coach-body"><div class="coach-step" id="coachStep"></div><div class="coach-text" id="coachText"></div></div>
+  </div>
   <div class="stage">
     <div class="board" id="board" tabindex="-1">
       <div class="grid" id="grid"></div>
@@ -860,6 +885,22 @@ const TRACKS = {
            F5:2 A5:2 C6:2 A5:2 G5:2 F5:2 A5:4 | G5:2 B5:2 D6:2 B5:2 C6:4 -:4 |
            C6:4 B5:2 A5:2 G5:4 E5:4 | A5:4 G5:2 E5:2 C5:4 E5:4 |
            F5:2 G5:2 A5:2 C6:2 A5:4 F5:4 | G5:2 F5:2 E5:2 D5:2 B4:4 D5:4` },
+  march: { bpm: 126, bassPattern: [0, 7, 0, 7], drums: 'bounce',
+    chords: ['G2', 'C3', 'D3', 'G2', 'E2', 'C3', 'D3', 'G2'],
+    lead: `G4:2 B4:2 D5:4 B4:2 D5:2 G5:4 | E5:2 D5:2 C5:2 E5:2 G5:4 E5:4 |
+           F#5:2 E5:2 D5:2 F#5:2 A5:4 F#5:4 | G5:4 D5:4 B4:4 -:4 |
+           E5:2 G5:2 B5:4 A5:2 G5:2 E5:4 | C5:2 E5:2 G5:4 E5:2 D5:2 C5:4 |
+           D5:2 F#5:2 A5:2 F#5:2 D5:2 C5:2 A4:4 | B4:2 D5:2 G5:4 D5:2 B4:2 G4:4` },
+  groove: { bpm: 100, bassPattern: [0, 0, 12, 10], drums: 'funk',
+    chords: ['A2', 'D3', 'A2', 'D3', 'F2', 'G2', 'A2', 'E2'],
+    lead: `A4:3 C5:1 -:2 E5:2 D5:3 C5:1 A4:4 | D5:3 F#5:1 -:2 A5:2 G5:3 F#5:1 D5:4 |
+           A4:2 C5:2 E5:2 G5:2 A5:3 G5:1 E5:4 | F#5:2 A5:2 C6:4 A5:3 F#5:1 D5:4 |
+           F5:3 A5:1 -:2 C6:2 A5:3 F5:1 C5:4 | G5:3 B5:1 -:2 D6:2 B5:3 G5:1 D5:4 |
+           A5:2 G5:2 E5:2 C5:2 D5:2 E5:2 A4:4 | G#4:2 B4:2 E5:4 D5:2 B4:2 G#4:4` },
+  sky: { bpm: 92, bassPattern: [0, 7, 12, 7], drums: 'soft', wave: 'triangle',
+    chords: ['F2', 'C3', 'D3', 'Bb2', 'F2', 'C3', 'Bb2', 'C3'],
+    lead: `A5:4 C6:4 A5:4 F5:4 | G5:4 E5:4 C5:8 | D5:4 F5:4 A5:4 D6:4 | C6:4 Bb5:4 F5:8 |
+           F5:2 A5:2 C6:4 A5:2 C6:2 F6:4 | E6:4 D6:2 C6:2 G5:8 | D6:4 C6:2 Bb5:2 F5:4 D5:4 | E5:4 G5:4 C6:8` },
   boss: { bpm: 150, bassPattern: [0, 0, 12, 0], drums: 'pound',
     chords: ['A2', 'F2', 'G2', 'E2', 'A2', 'F2', 'G2', 'E2'],
     lead: `A4:2 A4:2 C5:2 A4:2 E5:4 D5:2 C5:2 | C5:2 C5:2 F5:2 C5:2 A5:4 G5:2 F5:2 |
@@ -884,20 +925,21 @@ for (const tr of Object.values(TRACKS)) {           // turn the lead text into a
 const music = { track: null, step: 0, nextTime: 0, gain: null, noise: null };
 function musicTempo() {
   const tr = TRACKS[music.track];
-  return tr.bpm + (music.track === 'boss' && state.boss && state.boss.hp <= 5 ? 16 : 0);   // speeds up for the finish
+  return tr.bpm + (music.track === 'boss' && state.boss && state.boss.enraged ? 16 : 0);   // speeds up when the Cyclops gets angry
 }
 function wantedTrack() {
   if (!ac || store.musicOff || document.hidden) return null;
   if (state.screen === 'over') return null;
   if (state.phase === 'boss' && state.boss) return state.boss.hp > 0 ? 'boss' : null;   // a beat of silence when the boss falls
-  return 'main';
+  return state.levelTrack || 'main';
 }
 // How scary the music should be: 1 when a monster is next to you (or the club is aimed at your row), 0 when you're safe.
 function dangerTarget() {
   if (state.screen !== 'play') return 0;
   let d = 99;
   for (const m of state.mons) if (inGrid(m.r, m.c)) d = Math.min(d, Math.abs(m.r - state.player.r) + Math.abs(m.c - state.player.c));
-  if (state.boss && state.boss.smash && state.boss.smash.row === state.player.r) d = Math.min(d, 1);
+  const sm = state.boss && state.boss.smash;
+  if (sm && (sm.row === state.player.r || sm.col === state.player.c)) d = Math.min(d, 1);
   return d <= 1 ? 1 : d === 2 ? .6 : 0;
 }
 function updateMusic() {
@@ -951,7 +993,7 @@ function drum(kind, t) {
 function playStep(tr, step, t, spb) {
   const bar = Math.floor(step / 16), s = step % 16, root = tr.roots[bar];
   const lead = tr.notes[step];
-  if (lead) tone('square', hz(lead[0]), t, lead[1] * spb * .92, .045, 2600);
+  if (lead) tone(tr.wave || 'square', hz(lead[0]), t, lead[1] * spb * .92, tr.wave === 'triangle' ? .085 : .045, 2600);
   const fear = music.danger || 0;
   if (fear > .25) {
     if (lead) tone('sawtooth', hz(lead[0] + 1), t, lead[1] * spb * .92, .022 * fear, 1400);   // a clashing note a half step up
@@ -966,6 +1008,13 @@ function playStep(tr, step, t, spb) {
     if (s === 0 || s === 8 || s === 10) drum('kick', t);
     if (s === 4 || s === 12) drum('snare', t);
     if (s % 4 === 2) drum('hat', t);
+  } else if (tr.drums === 'funk') {
+    if (s === 0 || s === 3 || s === 8 || s === 11) drum('kick', t);
+    if (s === 4 || s === 12) drum('snare', t);
+    if (s % 2 === 1) drum('hat', t);
+  } else if (tr.drums === 'soft') {
+    if (s === 0 || s === 8) drum('kick', t);
+    if (s === 6 || s === 14) drum('hat', t);
   } else {
     if (s % 4 === 0) drum('kick', t);
     if (s === 4 || s === 12) drum('snare', t);
@@ -1006,7 +1055,7 @@ renderSoundBtn();
 function hud() {
   $('#score').textContent = state.score;
   const boss = state.phase === 'boss' && state.boss;
-  $('#level').textContent = boss ? 'Boss' : state.level;
+  $('#level').textContent = boss ? 'Boss' : state.phase === 'tutorial' ? 'Learn' : state.level;
   $('#lives').innerHTML = Array.from({ length: Math.max(0, state.lives) }, () => gobblerSVG()).join('');
   $('#left').textContent = boss ? `${state.boss.hp} left` : `${state.goodLeft} left`;
   if (boss) $('#hpFill').style.width = (100 * state.boss.hp / state.boss.max) + '%';
@@ -1025,12 +1074,15 @@ function sizeClass(item) {
   const plain = String(item.html).replace(/<[^>]+>/g, '');
   return item.cls || (plain.length <= 3 ? '' : plain.length <= 5 ? 'long' : plain.length <= 7 ? 'xlong' : 'xxlong');
 }
+// Regular levels pick one of these songs at random (never the same one twice in a row). Boss fights use 'boss'.
+const LEVEL_TRACKS = ['main', 'march', 'groove', 'sky'];
 function buildLevel() {
-  const def = chooseRule();
+  if (state.phase !== 'boss') state.levelTrack = pick(LEVEL_TRACKS.filter(t => t !== state.levelTrack));
+  const def = state.phase === 'tutorial' ? TUTORIAL_TOPIC : chooseRule();
   state.ruleKey = def.key;
   const rule = def.make();
   state.rule = rule;
-  const total = COLS * ROWS, nGood = Math.round(ri(9, 12) * COLS / 6);
+  const total = COLS * ROWS, nGood = state.phase === 'tutorial' ? 8 : Math.round(ri(9, 12) * COLS / 6);
   const goodSet = new Set(shuffle([...Array(total).keys()]).slice(0, nGood));
   const seen = new Set();
   state.cells = [];
@@ -1056,13 +1108,13 @@ function buildLevel() {
    Once per level a "?" block appears on a square. Gobble it and every right answer
    flashes for a split second. In a boss fight, a new one appears every 5 right answers. */
 const HINT_FLASH_MS = 500;
-function spawnHint() {
+function spawnHint(at = null) {
   if (state.hint) return;
   const busy = new Set(state.mons.filter(m => inGrid(m.r, m.c)).map(m => m.r * COLS + m.c));
   busy.add(state.player.r * COLS + state.player.c);
   const spots = state.cells.map((c, i) => i).filter(i => !busy.has(i));
   if (!spots.length) return;
-  const i = pick(spots), r = Math.floor(i / COLS), c = i % COLS;
+  const i = at !== null && !busy.has(at) ? at : pick(spots), r = Math.floor(i / COLS), c = i % COLS;
   const el = document.createElement('div');
   el.className = 'sprite hint'; el.innerHTML = '<span>?</span>';
   place(el, r, c, true); spritesEl.appendChild(el);
@@ -1076,6 +1128,7 @@ function useHint() {
   const shown = state.cells.map((c, i) => c.good && !c.eaten ? cellEls[i] : null).filter(Boolean);
   shown.forEach(el => el.classList.add('reveal'));
   setTimeout(() => shown.forEach(el => el.classList.remove('reveal')), HINT_FLASH_MS);
+  tutEvent('hint');
 }
 function markHere() {
   const idx = state.player.r * COLS + state.player.c;
@@ -1088,7 +1141,7 @@ function clearMonsters() {
   state.mons = []; state.warns = [];
   clearSmash();
 }
-function startWarning(fromTop = false) {
+function startWarning(fromTop = false, forcedType = null) {
   for (let tries = 0; tries < 20; tries++) {
     const side = fromTop ? 2 : ri(0, 3);
     let sr, sc, dr, dc;
@@ -1099,7 +1152,7 @@ function startWarning(fromTop = false) {
     const er = sr + dr, ec = sc + dc;
     if (Math.abs(er - state.player.r) + Math.abs(ec - state.player.c) <= 1) continue;
     if (state.warns.some(w => w.er === er && w.ec === ec)) continue;
-    const type = pickMonsterType();
+    const type = forcedType || pickMonsterType();
     const el = document.createElement('div');
     el.className = 'sprite warn ' + type; el.innerHTML = '<span>!</span>';
     place(el, er, ec, true); spritesEl.appendChild(el);
@@ -1176,6 +1229,7 @@ function stepMonster(m) {
   if (!inGrid(m.r, m.c)) {
     state.mons = state.mons.filter(x => x !== m);
     setTimeout(() => m.el.remove(), 350);
+    tutEvent('monster-gone');
     return;
   }
   if (m.r === state.player.r && m.c === state.player.c) return caught(m);
@@ -1200,6 +1254,7 @@ function move(dr, dc) {
   place(playerEl, r, c);
   markHere();
   checkCollision();
+  tutEvent('move');
 }
 function eat() {
   if (state.screen !== 'play') return;
@@ -1212,7 +1267,7 @@ function eat() {
     state.score += 5 + 5 * Math.min(state.level, 10);
     state.goodLeft--; sfx('eat');
     if (state.phase === 'boss') bossHit();
-    else { hud(); if (state.goodLeft === 0) levelDone(); }
+    else { hud(); tutEvent('good'); if (state.goodLeft === 0) levelDone(); }
   } else {
     cellEls[i].classList.add('wrong');
     setTimeout(() => cellEls[i].classList.remove('wrong'), 700);
@@ -1244,12 +1299,20 @@ function hideCard() { overlay.hidden = true; grabFocus(); }
 function resume() { hideCard(); state.screen = 'play'; }
 
 function loseLife(title, html, sprite, sound = 'hit') {
+  if (state.phase === 'tutorial') {   // practice: show what would happen, but don't take a life
+    sfx(sound); clearMonsters();
+    const kind = sound === 'wrong' ? 'bad' : 'caught';
+    showCard({ title, html: html + `<p class="small">In a real game, that costs a life. In the tutorial it's free.</p>`, sprite,
+      buttons: [{ label: 'Keep going', primary: true, action: () => { resume(); tutEvent(kind); } }] });
+    return;
+  }
   state.lives--; sfx(sound); hud();
   clearMonsters(); state.spawnT = firstDelay();
   if (state.lives <= 0) { state.screen = 'over'; setTimeout(() => gameOver(title, html), 300); return; }
   showCard({ title, html, sprite, buttons: [{ label: 'Keep going', primary: true, action: resume }] });
 }
 function levelDone() {
+  if (state.phase === 'tutorial') return tutorialBoardCleared();
   if (currentModule().boss && state.phase === 'warmup') return bossIntro();
   if (!currentModule().boss && state.level % BOSS_EVERY === 0) return bossIntro();
   state.screen = 'clear';
@@ -1333,7 +1396,8 @@ function startBoss() {
   state.phase = 'boss';
   // ?bosshp=3 in the address gives the Cyclops less health (handy for testing the ending).
   let hp = BOSS_HP; try { hp = Math.max(1, parseInt(new URLSearchParams(location.search).get('bosshp'), 10) || BOSS_HP); } catch (e) {}
-  state.boss = { hp, max: hp, correct: 0, smashT: gentleBoss() ? 8000 : 6500, smash: null };
+  state.boss = { hp, max: hp, correct: 0, smashT: gentleBoss() ? 8000 : 6500, smash: null, enraged: false };
+  $('#ruleBar').classList.remove('enraged');
   $('#bossRow .bossname').textContent = bossName();
   $('#bossStage').innerHTML = cyclopsSVG();
   $('#bossStage').hidden = false;
@@ -1343,11 +1407,14 @@ function startBoss() {
   setupGrid(8);
   buildLevel();
   state.spawnT = 2500;
+  if (state.boss.hp <= ENRAGE_HP) enrage(false);   // only happens when testing with a low ?bosshp
   resume();
 }
 function exitBoss() {
   clearSmash();
-  state.phase = 'normal'; state.boss = null;
+  state.phase = 'normal'; state.boss = null; state.tut = null;
+  $('#coach').hidden = true;
+  cellEls.forEach(el => el.classList.remove('target'));
   $('#bossStage').hidden = true; $('#bossStage').innerHTML = '';
   $('#ruleBar').classList.remove('boss');
   $('#bossRow').hidden = true;
@@ -1362,6 +1429,7 @@ function bossHit() {
   const cy = cyclopsEl(); if (cy) { cy.classList.remove('ouch'); void cy.getBoundingClientRect(); cy.classList.add('ouch'); }
   hud();
   if (b.hp <= 0) return bossDefeated();
+  if (b.hp <= ENRAGE_HP && !b.enraged) enrage(true);
   if (b.correct % 5 === 0) {
     if (store.monsters !== 'off') startWarning(true);   // every 5 right: the Cyclops sends another monster
     spawnHint();                                         // …and a fresh hint block appears
@@ -1381,29 +1449,62 @@ function bossUpdate(dt) {
   b.smashT -= dt;
   if (b.smashT <= 0) startSmash();
 }
+/* At 10 health the Cyclops gets angry: it swings every 5 seconds and each swing hits a random row AND a random column. */
+const ENRAGE_HP = 10, ENRAGED_CYCLE_MS = 5000;
+const smashWarnMs = () => {
+  const b = state.boss;
+  if (b.enraged) return gentleBoss() ? 2000 : 1500;
+  return gentleBoss() ? Math.max(1500, 2300 - 35 * b.correct) : Math.max(1000, 1700 - 35 * b.correct);
+};
+function enrage(announce) {
+  const b = state.boss;
+  b.enraged = true;
+  cyclopsEl()?.classList.add('angry');
+  $('#ruleBar').classList.add('enraged');
+  if (!announce) return;
+  if (!b.smash) b.smashT = Math.min(b.smashT, 1200);
+  sfx('boss');
+  const msg = document.createElement('div');
+  msg.className = 'boss-msg'; msg.textContent = 'The Cyclops is ANGRY!';
+  spritesEl.appendChild(msg);
+  setTimeout(() => msg.remove(), 1800);
+}
+function smashBand(kind, index) {
+  const el = document.createElement('div');
+  el.className = 'smash ' + kind;
+  if (kind === 'row') el.style.top = (index * 100 / ROWS) + '%';
+  else { el.style.left = (index * 100 / COLS) + '%'; el.style.width = (100 / COLS) + '%'; }
+  spritesEl.appendChild(el);
+  return el;
+}
 function startSmash() {
   const b = state.boss;
-  const row = Math.random() < .6 ? state.player.r : ri(0, ROWS - 1);
-  const el = document.createElement('div');
-  el.className = 'smash'; el.style.top = (row * 100 / ROWS) + '%';
-  spritesEl.appendChild(el);
-  b.smash = { row, el, t: gentleBoss() ? Math.max(1500, 2300 - 35 * b.correct) : Math.max(1000, 1700 - 35 * b.correct) };
+  let row, col = null;
+  if (b.enraged) { row = ri(0, ROWS - 1); col = ri(0, COLS - 1); }          // angry: a random row and a random column
+  else row = Math.random() < .6 ? state.player.r : ri(0, ROWS - 1);       // before that: one row, often yours
+  const els = [smashBand('row', row)];
+  if (col !== null) els.push(smashBand('col', col));
+  b.smash = { row, col, els, t: smashWarnMs() };
   cyclopsEl()?.classList.add('raise');
   sfx('warn');
 }
 function doSmash() {
-  const b = state.boss, { row, el } = b.smash;
+  const b = state.boss, { row, col, els, t } = b.smash;
   b.smash = null;
-  b.smashT = gentleBoss() ? Math.max(4000, 7500 - 150 * b.correct) : Math.max(2500, 6000 - 150 * b.correct);
-  el.classList.add('hit'); el.innerHTML = '<span>BONK!</span>';
-  setTimeout(() => el.remove(), 450);
+  b.smashT = b.enraged
+    ? ENRAGED_CYCLE_MS - smashWarnMs()                                     // one swing every 5 seconds, warning included
+    : gentleBoss() ? Math.max(4000, 7500 - 150 * b.correct) : Math.max(2500, 6000 - 150 * b.correct);
+  const inStrike = (r, c) => r === row || (col !== null && c === col);
+  els.forEach(el => { el.classList.add('hit'); el.innerHTML = '<span>BONK!</span>'; setTimeout(() => el.remove(), 450); });
   const cy = cyclopsEl();
   if (cy) { cy.classList.remove('raise', 'swing'); void cy.getBoundingClientRect(); cy.classList.add('swing'); setTimeout(() => cy.classList.remove('swing'), 450); }
   const board = $('#board'); board.classList.remove('shake'); void board.offsetWidth; board.classList.add('shake');
   sfx('smash');
-  for (const m of [...state.mons]) if (m.r === row && inGrid(m.r, m.c)) { m.el.remove(); state.mons = state.mons.filter(x => x !== m); }   // the club squashes monsters too
-  if (state.player.r === row)
-    loseLife('The Cyclops bonked you!', `<p>When a row flashes red, move out of it before the club comes down!</p>`, { svg: cyclopsSVG(), cls: 'wide' });
+  for (const m of [...state.mons]) if (inGrid(m.r, m.c) && inStrike(m.r, m.c)) { m.el.remove(); state.mons = state.mons.filter(x => x !== m); }   // the club squashes monsters too
+  if (inStrike(state.player.r, state.player.c))
+    loseLife('The Cyclops bonked you!', col === null
+      ? `<p>When a row flashes red, move out of it before the club comes down!</p>`
+      : `<p>The angry Cyclops hits a row <b>and</b> a column. Get out of both red stripes before the club comes down!</p>`, { svg: cyclopsSVG(), cls: 'wide' });
 }
 function clearSmash() {
   document.querySelectorAll('.smash').forEach(el => el.remove());
@@ -1456,7 +1557,7 @@ function showMenu() {
     <div class="field"><div class="label">Monsters</div><div class="chips">
       ${chip('monsters', 'off', 'None', store.monsters === 'off')}${chip('monsters', 'slow', 'Slow', store.monsters === 'slow')}${chip('monsters', 'normal', 'Normal', store.monsters === 'normal')}
     </div></div>
-    <div class="card-actions"><button class="btn" data-primary id="playBtn">Play</button></div>
+    <div class="card-actions"><button class="btn" data-primary id="playBtn">Play</button><button class="btn ghost" id="tutBtn">${store.tutorialSeen ? 'How to play' : 'New? Learn how to play'}</button></div>
     <div class="cast">
       <div>${gobblerSVG()}You</div>${Object.values(MONSTERS).map(t => `<div>${t.svg}${t.name}</div>`).join('')}
     </div>
@@ -1472,8 +1573,91 @@ function showMenu() {
   });
   $('#makeBtn').onclick = () => showEditor();
   $('#playBtn').onclick = () => { audioInit(); startGame(); };
+  $('#tutBtn').onclick = () => { audioInit(); startTutorial(); };
   overlay.hidden = false; cardOpenedAt = performance.now();
-  $('#playBtn').focus({ preventScroll: true });
+  (store.tutorialSeen ? $('#playBtn') : $('#tutBtn')).focus({ preventScroll: true });
+}
+
+/* ---------- Tutorial ----------
+   A practice level with a coach bubble. Each step waits for the player to do something, then moves on.
+   Nothing in the tutorial costs a life. */
+const TUTORIAL_TOPIC = { key: 'tutorial', make() { return { text: 'Even numbers',
+  good: () => ({ html: 2 * ri(1, 10) }),
+  bad: () => { const n = 2 * ri(0, 9) + 1; return { html: n, why: `${n} is odd. Even numbers end in 0, 2, 4, 6 or 8.` }; } }; } };
+const TUT_STEPS = [
+  { text: () => `This is you, the <b>Gobbler</b>! Move with the <b>arrow keys</b>, or tap a square to walk toward it. Walk to the <b>glowing green square</b>.`,
+    setup() {
+      const p = state.player, r = Math.min(ROWS - 1, p.r + 1), c = p.c + 2 < COLS ? p.c + 2 : p.c - 2;
+      state.tut.target = r * COLS + c; cellEls[state.tut.target].classList.add('target');
+    },
+    done: e => e === 'move' && state.player.r * COLS + state.player.c === state.tut.target,
+    after() { cellEls.forEach(el => el.classList.remove('target')); } },
+  { text: () => `The yellow bar shows the <b>rule</b>: <b>Even numbers</b>. Walk onto an even number and press <b>Space</b> (or tap your Gobbler) to gobble it.`,
+    done: e => e === 'good' },
+  { text: () => `Yum! Now gobble an <b>odd</b> number on purpose, just to see what happens when you get one wrong.`,
+    done: e => e === 'bad' },
+  { text: () => `See the yellow <b>?</b> block next to you? It's a <b>hint</b>. Gobble it and every right answer flashes for a split second. Watch closely!`,
+    setup() {
+      const p = state.player, spots = [[0, 1], [0, -1], [1, 0], [-1, 0]].map(([dr, dc]) => [p.r + dr, p.c + dc]).filter(([r, c]) => inGrid(r, c));
+      const [r, c] = pick(spots); spawnHint(r * COLS + c);
+    },
+    done: e => e === 'hint' },
+  { text: () => `Uh oh, a <b>monster</b>! A flashing <b>!</b> shows where it's coming in. Stay out of its way until it walks off the board.`,
+    setup() {   // a short pause first, so the hint flash and the monster don't happen at the same moment
+      const step = state.tut.step;
+      setTimeout(() => { if (state.phase === 'tutorial' && state.tut && state.tut.step === step) startWarning(false, 'grumble'); }, 1500);
+    },
+    done: e => e === 'monster-gone',
+    retry: e => e === 'caught' },
+  { text: () => `You've got it! Now gobble <b>every</b> even number to clear the board. The bar shows how many are left.`,
+    done: e => e === 'clear' },
+];
+function startTutorial() {
+  clearMonsters(); exitBoss();
+  state.level = 1; state.score = 0; state.lives = 3; state.ruleKey = null;
+  state.phase = 'tutorial'; state.tut = { step: 0 };
+  $('#coachFace').innerHTML = gobblerSVG();
+  $('#coach').hidden = false;
+  $('#board').style.setProperty('--extra', '80px');
+  buildLevel();
+  resume();
+  showTutStep();
+}
+function showTutStep() {
+  const s = TUT_STEPS[state.tut.step];
+  $('#coachStep').textContent = `Tutorial · step ${state.tut.step + 1} of ${TUT_STEPS.length}`;
+  $('#coachText').innerHTML = s.text();
+  const coach = $('#coach'); coach.classList.remove('pop'); void coach.offsetWidth; coach.classList.add('pop');
+  if (s.setup) s.setup();
+}
+function tutEvent(e) {
+  if (state.phase !== 'tutorial' || !state.tut) return;
+  const s = TUT_STEPS[state.tut.step];
+  if (s.retry && s.retry(e)) { if (s.setup) s.setup(); return; }   // e.g. the monster caught you: send another one
+  if (!s.done(e)) return;
+  if (s.after) s.after();
+  state.tut.step++;
+  sfx('hint');
+  if (state.tut.step >= TUT_STEPS.length) return finishTutorial();
+  showTutStep();
+}
+function tutorialBoardCleared() {
+  if (TUT_STEPS[state.tut.step].done('clear')) return tutEvent('clear');
+  // Cleared the board before the last step: put a few more even numbers out so the lesson can continue.
+  const here = state.player.r * COLS + state.player.c;
+  shuffle(state.cells.map((c, i) => i).filter(i => state.cells[i].eaten && i !== here)).slice(0, 4).forEach(i => setCell(i, true));
+  hud();
+}
+function finishTutorial() {
+  state.screen = 'clear'; clearMonsters(); sfx('level');
+  store.tutorialSeen = true; save();
+  setTimeout(() => showCard({
+    title: `You're ready!`,
+    html: `<p>Every level has a new rule. Gobble everything that fits, dodge the monsters, and grab the <b>?</b> for a hint.</p>
+      <p><b>Every 3 levels, a Cyclops boss shows up.</b> Get 20 right to beat it. When a row flashes red, get out of it before the club comes down. At 10 health it gets angry and hits a row <b>and</b> a column every 5 seconds!</p>`,
+    sprite: { svg: cyclopsSVG(), cls: 'wide bounce' },
+    buttons: [{ label: 'Play', primary: true, action: startGame }, { label: 'Menu', action: showMenu }]
+  }, 'over'), 400);
 }
 
 /* ---------- Make-your-own editor ---------- */
@@ -1577,12 +1761,15 @@ document.addEventListener('pointerdown', e => {
 let last = performance.now();
 function update(dt) {
   if (state.phase === 'boss' && state.boss) { bossUpdate(dt); if (state.screen !== 'play') return; }
-  if (!state.hintUsed) { state.hintT -= dt; if (state.hintT <= 0) spawnHint(); }
-  if (store.monsters === 'off') return;
-  state.spawnT -= dt;
-  if (state.spawnT <= 0) {
-    if (state.mons.length + state.warns.length < maxMons()) startWarning();
-    state.spawnT = spawnGap();
+  const tutorial = state.phase === 'tutorial';   // the tutorial places its own hint and monster, step by step
+  if (!tutorial) {
+    if (!state.hintUsed) { state.hintT -= dt; if (state.hintT <= 0) spawnHint(); }
+    if (store.monsters === 'off') return;
+    state.spawnT -= dt;
+    if (state.spawnT <= 0) {
+      if (state.mons.length + state.warns.length < maxMons()) startWarning();
+      state.spawnT = spawnGap();
+    }
   }
   for (const w of [...state.warns]) {
     w.t -= dt;
