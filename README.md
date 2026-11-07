@@ -7,6 +7,7 @@ Browser games for kids. No installs and no accounts: open the page and play.
 | Game | What it is |
 |---|---|
 | [Gobble Grid](gobble-grid/) | Gobble every square that fits the rule ("Multiples of 7", "Starts with a blend"), dodge monsters, and beat the Cyclops boss. Math for grades 2–9, plus word sorting. |
+| [Wildwood](wildwood/) | A 3D forest that goes on forever, with rivers and lakes every few minutes of walking. Friendly deer, rabbits and foxes; wolves and cave bears to fight; giant snakes in marshes and rare dragon bosses. Made for an Xbox controller; keyboard and mouse work too. |
 
 ## How it's organized
 

@@ -103,6 +103,25 @@ const GAMES = [
       </g>
     </svg>`,
   },
+  {
+    folder: 'wildwood',
+    title: 'Wildwood',
+    blurb: 'Wander a 3D forest that goes on forever. Meet deer and rabbits, fight wolves and cave bears, find giant snakes in the marshes, and hunt for a rare dragon. Plays great with an Xbox controller.',
+    tags: ['Explore', '3D', 'Adventure', 'Controller'],
+    accent: '#8fe36b', artBg: '#9fc7e8',
+    art: `<svg viewBox="0 0 320 180" aria-hidden="true">
+      <defs><linearGradient id="wwSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4f8fd8"/><stop offset="1" stop-color="#cfe0ee"/></linearGradient></defs>
+      <rect width="320" height="180" fill="url(#wwSky)"/>
+      <ellipse cx="70" cy="34" rx="34" ry="9" fill="#fff" opacity=".85"/><ellipse cx="236" cy="26" rx="26" ry="7" fill="#fff" opacity=".8"/>
+      <path d="M0 104 Q60 80 130 96 T320 88 V180 H0Z" fill="#7fae55"/>
+      <path d="M0 122 Q80 108 160 118 T320 112 V180 H0Z" fill="#5f9a3e"/>
+      <path d="M-10 150 Q90 128 170 140 T330 132 V158 Q240 150 170 162 T-10 172Z" fill="#d9c98f"/>
+      <path d="M-10 154 Q90 134 170 146 T330 138 V152 Q240 146 170 156 T-10 166Z" fill="#5aa6c4"/>
+      ${[[40,96,1],[92,92,.8],[254,88,1.1],[290,96,.7]].map(([x,y,k]) => `<g transform="translate(${x} ${y}) scale(${k})"><rect x="-3" y="-4" width="6" height="16" fill="#5a3b22"/><polygon points="0,-46 -16,-14 16,-14" fill="#1f5a33"/><polygon points="0,-36 -20,-2 20,-2" fill="#24683a"/></g>`).join('')}
+      <g transform="translate(176 106)"><rect x="-4" y="-10" width="8" height="24" fill="#5a3b22"/><circle cx="0" cy="-22" r="20" fill="#3f8a34"/><circle cx="-14" cy="-12" r="13" fill="#4a9a3c"/><circle cx="14" cy="-12" r="13" fill="#367a2e"/></g>
+      ${[[20,178],[60,176],[118,178],[214,177],[300,178]].map(([x,y]) => `<path d="M${x} ${y} l-6 -20 l9 16 l2 -22 l4 22 l8 -15 l-5 19Z" fill="#8fe36b"/>`).join('')}
+    </svg>`,
+  },
 ];
 
 const esc = s => String(s).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
