@@ -2,11 +2,121 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Gobble Grid</title>
-<meta http-equiv="refresh" content="0; url=gobble-grid.html">
-<link rel="canonical" href="gobble-grid.html">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kid Games</title>
+<meta name="description" content="Browser games for kids: math, words and more.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@700;800;900&display=swap">
+<style>
+/* Layout: an arcade shelf. Big title, then a grid of game cards (art on top, name, blurb, tags), one "more coming" slot. */
+:root{
+  --night:#15123f;
+  --shelf:#201c5c;
+  --edge:#433db0;
+  --cream:#fff5dc;
+  --muted:#aaa5e6;
+  --sun:#ffd23f;
+  --berry:#d6407f;
+  --ink:#151233;
+  --display:"Lilita One","Arial Rounded MT Bold","Trebuchet MS",system-ui,sans-serif;
+  --body:"Nunito","Avenir Next","Segoe UI",system-ui,sans-serif;
+  color-scheme:dark;
+}
+html,body{min-height:100%}
+body{
+  margin:0;background-color:var(--night);color:var(--cream);font-family:var(--body);font-weight:800;
+  background-image:radial-gradient(rgba(255,255,255,.06) 1px,transparent 1.6px);background-size:22px 22px;
+}
+.wrap{
+  max-width:1040px;margin:0 auto;box-sizing:border-box;
+  padding-block:40px 56px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:28px;
+}
+header{display:flex;flex-direction:column;gap:8px}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(44px,9vw,76px);line-height:.95;margin:0;color:var(--sun);text-shadow:0 5px 0 var(--berry);letter-spacing:.01em}
+.lede{margin:0;font-size:clamp(17px,2.4vw,20px);color:var(--muted);max-width:44ch}
+.shelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+.game{
+  display:flex;flex-direction:column;text-decoration:none;color:inherit;
+  background:var(--shelf);border:4px solid var(--edge);border-radius:22px;overflow:hidden;
+  transition:transform .15s ease,border-color .15s ease;
+}
+.game:hover{transform:translateY(-4px);border-color:var(--accent,var(--sun))}
+.game:focus-visible{outline:4px solid var(--sun);outline-offset:4px}
+.art{aspect-ratio:16/9;background:var(--art-bg,var(--ink));display:grid;place-items:center;overflow:hidden}
+.art svg{width:100%;height:100%}
+.info{display:flex;flex-direction:column;gap:8px;padding:16px 18px 18px;flex:1}
+.info h2{font-family:var(--display);font-weight:400;font-size:28px;margin:0;line-height:1;color:var(--accent,var(--sun))}
+.info p{margin:0;font-size:16px;line-height:1.4;color:var(--cream)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:6px}
+.tag{font-size:12px;letter-spacing:.06em;text-transform:uppercase;background:var(--night);border:2px solid var(--edge);color:var(--muted);border-radius:999px;padding:3px 10px}
+.play{align-self:flex-start;margin-top:4px;font-family:var(--display);font-size:20px;background:var(--accent,var(--sun));color:var(--ink);border-radius:12px;padding:8px 18px}
+.soon{
+  border:4px dashed var(--edge);border-radius:22px;display:grid;place-items:center;text-align:center;
+  padding:28px;color:var(--muted);min-height:200px;
+}
+.soon b{display:block;font-family:var(--display);font-weight:400;font-size:26px;color:var(--cream);margin-bottom:6px}
+footer{color:var(--muted);font-size:14px}
+footer a{color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.game{transition:none}.game:hover{transform:none}}
+</style>
 </head>
 <body>
-<p><a href="gobble-grid.html">Play Gobble Grid</a></p>
+<div class="wrap">
+  <header>
+    <h1>Kid Games</h1>
+    <p class="lede">Pick a game to play. Everything runs right in your browser.</p>
+  </header>
+
+  <main class="shelf" id="shelf"></main>
+
+  <footer>Made at home. <a href="https://github.com/npyati/kid-games">See the code on GitHub</a>.</footer>
+</div>
+
+<script>
+/* ---------- The game list ----------
+   To add a game: put it in its own folder with an index.html, then add an entry here.
+   art is an inline SVG (viewBox 0 0 320 180) shown at the top of the card. */
+const GAMES = [
+  {
+    folder: 'gobble-grid',
+    title: 'Gobble Grid',
+    blurb: 'Steer your Gobbler around the grid and gobble every square that fits the rule. Dodge monsters and beat the Cyclops boss.',
+    tags: ['Math', 'Words', 'Grades 2–9'],
+    accent: '#8fe36b', artBg: '#201c5c',
+    art: `<svg viewBox="0 0 320 180" aria-hidden="true">
+      ${[0,1,2].map(r => [0,1,2,3,4].map(c => `<rect x="${46 + c * 46}" y="${22 + r * 46}" width="40" height="40" rx="9" fill="#2e2a80"/>`).join('')).join('')}
+      ${[['12',0,0],['7',1,0],['18',3,0],['5',4,0],['9',0,1],['24',2,1],['3',3,1],['15',1,2],['30',3,2]].map(([n,c,r]) => `<text x="${66 + c * 46}" y="${49 + r * 46}" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size="17" fill="#fff5dc">${n}</text>`).join('')}
+      <g transform="translate(78 65) scale(.42)">
+        <path d="M14 60 C14 34 30 21 50 21 C70 21 86 34 86 60 C86 80 70 88 50 88 C30 88 14 80 14 60Z" fill="#8fe36b" stroke="#151233" stroke-width="5"/>
+        <circle cx="38" cy="44" r="11" fill="#fff" stroke="#151233" stroke-width="3"/><circle cx="62" cy="44" r="11" fill="#fff" stroke="#151233" stroke-width="3"/>
+        <circle cx="41" cy="46" r="5" fill="#151233"/><circle cx="65" cy="46" r="5" fill="#151233"/>
+        <path d="M30 60 Q50 86 70 60 Z" fill="#151233"/>
+      </g>
+      <g transform="translate(222 112) scale(.4)">
+        <polygon points="50,9 58,20 72,14 72,29 87,32 79,45 90,55 77,63 81,78 66,76 60,90 50,80 40,90 34,76 19,78 23,63 10,55 21,45 13,32 28,29 28,14 42,20" fill="#ff6b5b" stroke="#151233" stroke-width="5" stroke-linejoin="round"/>
+        <circle cx="40" cy="51" r="7" fill="#fff"/><circle cx="60" cy="51" r="7" fill="#fff"/><circle cx="40" cy="52" r="3" fill="#151233"/><circle cx="60" cy="52" r="3" fill="#151233"/>
+        <path d="M28 34 L44 43 M72 34 L56 43" stroke="#151233" stroke-width="5" stroke-linecap="round"/>
+      </g>
+    </svg>`,
+  },
+];
+
+const esc = s => String(s).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+document.getElementById('shelf').innerHTML = GAMES.map(g => `
+  <a class="game" href="${esc(g.folder)}/" style="--accent:${esc(g.accent)};--art-bg:${esc(g.artBg)}">
+    <div class="art">${g.art}</div>
+    <div class="info">
+      <h2>${esc(g.title)}</h2>
+      <p>${esc(g.blurb)}</p>
+      <div class="tags">${g.tags.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>
+      <span class="play">Play</span>
+    </div>
+  </a>`).join('') + `
+  <div class="soon"><div><b>More games coming</b>We're building the next one now.</div></div>`;
+</script>
 </body>
 </html>
