@@ -122,6 +122,36 @@ const GAMES = [
       ${[[20,178],[60,176],[118,178],[214,177],[300,178]].map(([x,y]) => `<path d="M${x} ${y} l-6 -20 l9 16 l2 -22 l4 22 l8 -15 l-5 19Z" fill="#8fe36b"/>`).join('')}
     </svg>`,
   },
+  {
+    folder: 'chicken-runner',
+    title: 'Chicken Runner',
+    blurb: 'Race rival chickens through six worlds. Jump, flap, grab Speed Corn, dodge rotten eggs, collect coins, and buy silly skins.',
+    tags: ['Action', 'Racing', 'Skins', 'Controller'],
+    accent: '#ffd23f', artBg: '#6ec6ff',
+    art: `<svg viewBox="0 0 320 180" aria-hidden="true">
+      <defs><linearGradient id="crSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6ec6ff"/><stop offset="1" stop-color="#d8f1ff"/></linearGradient></defs>
+      <rect width="320" height="180" fill="url(#crSky)"/>
+      <circle cx="262" cy="36" r="20" fill="#fff3a6"/>
+      <ellipse cx="70" cy="34" rx="30" ry="9" fill="#fff"/><ellipse cx="190" cy="24" rx="22" ry="7" fill="#fff"/>
+      <path d="M0 120 Q80 96 160 112 T320 104 V150 H0Z" fill="#86c763"/>
+      <rect y="146" width="320" height="34" fill="#a8743f"/><rect y="142" width="320" height="9" fill="#5fb446"/>
+      <rect x="196" y="116" width="44" height="30" rx="5" fill="#e8b84a" stroke="#b8862a" stroke-width="2"/>
+      <path d="M209 116 V146 M227 116 V146" stroke="#8a5a2e" stroke-width="2.5"/>
+      ${[[150,70],[178,58],[206,54],[234,58],[262,70]].map(([x,y]) => `<circle cx="${x}" cy="${y}" r="7" fill="#ffd23f" stroke="#e09a12" stroke-width="2.5"/>`).join('')}
+      <g transform="translate(96 104) scale(1.25)">
+        <path d="M-14 -30 L-27 -44 L-22 -30 L-30 -36 L-18 -22Z" fill="#eadcc4"/>
+        <ellipse cx="-2" cy="-25" rx="18" ry="14" fill="#fff8ec" stroke="#2a1d12" stroke-width="2"/>
+        <circle cx="10" cy="-40" r="10" fill="#fff8ec" stroke="#2a1d12" stroke-width="2"/>
+        <ellipse cx="-2" cy="-25" rx="16.5" ry="12.5" fill="#fff8ec"/><ellipse cx="8" cy="-34" rx="7" ry="9" fill="#fff8ec" transform="rotate(17 8 -34)"/>
+        <ellipse cx="-8" cy="-30" rx="11" ry="6.5" fill="#eadcc4" stroke="#2a1d12" stroke-width="1.6" transform="rotate(-25 -8 -30)"/>
+        <circle cx="5" cy="-49" r="3.6" fill="#e8352f"/><circle cx="10" cy="-51" r="4" fill="#e8352f"/><circle cx="15" cy="-49" r="3.4" fill="#e8352f"/>
+        <path d="M18 -43 L27 -39 L18 -35Z" fill="#ffb020" stroke="#2a1d12" stroke-width="1.4"/>
+        <circle cx="13.5" cy="-42" r="2.6" fill="#2a1d12"/>
+        <path d="M-3 -13 L-6 -5 M5 -13 L9 -5" stroke="#f39c12" stroke-width="3.2" stroke-linecap="round"/>
+      </g>
+      <path d="M40 92 H70 M34 102 H64 M42 112 H66" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+    </svg>`,
+  },
 ];
 
 const esc = s => String(s).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
